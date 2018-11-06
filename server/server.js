@@ -132,6 +132,21 @@ app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user)
 })
 
+// POST /users/login {email, password}
+app.post('/users/login', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password'])
+
+
+    User.findByCredentials(body.email, body.password).then((user) => {
+        // Found user .. and Correct Password ... Return Token in header and return user
+        var token = user.tokens[user.tokens.length-1].token
+        res.header('x-auth', token)
+        res.send({user})
+    }).catch((e) => {
+        res.status(400).send({error: e})
+    })
+})
+
 
 // START SERVER AT PORT 3000
 app.listen(PORT, () => {
