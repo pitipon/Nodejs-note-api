@@ -2,7 +2,9 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
+const bcrypt = require('bcryptjs')
 
+// User Schema
 var UserSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -34,6 +36,7 @@ var UserSchema = new mongoose.Schema({
     }]
 })
 
+// Filter result of user only "_id" and "email"
 UserSchema.methods.toJSON = function () {
     var user = this
     var userObject = user.toObject()
@@ -41,6 +44,8 @@ UserSchema.methods.toJSON = function () {
     return _.pick(userObject, ['_id', 'email'])
 }
 
+// Methods to generate token
+// methods are defined on the document (instance).
 UserSchema.methods.generateAuthToken = function () {
     var user = this
     var access = 'auth'
@@ -53,6 +58,8 @@ UserSchema.methods.generateAuthToken = function () {
     })
 }
 
+// User Methods to verify token
+// statics are the methods defined on the Model.
 UserSchema.statics.findByToken = function (token) {
     var User = this
     var decoded
@@ -72,6 +79,29 @@ UserSchema.statics.findByToken = function (token) {
     })
 }
 
+// Bcrypt in Mongoose Middleware
+// to change plain password to bcrypt password
+UserSchema.pre('save', function (next) {
+    var user = this
+    console.log('Mongoose Middlware')
+    // Modified in document 'password'
+    if (user.isModified('password')) {
+        // user.password = hash
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                console.log(33333, hash)
+                user.password = hash
+                console.log(323232, user)
+                next()
+            })
+        })
+    } else {
+        next()
+    }
+})
+
+// Define User model from UserSchema
 var User = mongoose.model('User', UserSchema)
 
+// Export User model
 module.exports = { User }
