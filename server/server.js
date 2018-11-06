@@ -111,6 +111,7 @@ app.patch('/todos/:id', (req, res) => {
     })
 })
 
+// Create new User
 // POST /users
 app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password'])
@@ -126,12 +127,13 @@ app.post('/users', (req, res) => {
 })
 
 
-
+// Verify User
 // GET /users/me
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user)
 })
 
+// User Login
 // POST /users/login {email, password}
 app.post('/users/login', (req, res) => {
     var body = _.pick(req.body, ['email', 'password'])
@@ -144,6 +146,17 @@ app.post('/users/login', (req, res) => {
         res.send({user})
     }).catch((e) => {
         res.status(400).send({error: e})
+    })
+})
+
+// User logout
+// DELETE /users/me/token
+app.delete('/users/me/token', authenticate, (req, res) => {
+    console.log(3333,req.token)
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send()
+    }, () => {
+        res.status(400).send()
     })
 })
 

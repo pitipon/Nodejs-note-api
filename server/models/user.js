@@ -125,6 +125,17 @@ UserSchema.pre('save', function (next) {
     }
 })
 
+// Remove Token when User Logout
+UserSchema.methods.removeToken = function (token) {
+    var user = this
+
+    return user.update({
+        $pull: {
+            tokens: { token }
+        }
+    })
+}
+
 // Define User model from UserSchema
 var User = mongoose.model('User', UserSchema)
 
