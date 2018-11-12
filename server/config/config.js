@@ -9,7 +9,7 @@ console.log('env *******', env)
 // } else if (env === 'test') {
 //     process.env.PORT = 3000
 //     process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoAppTest'
-}
+// }
 
 if (env ==='development' || env === 'test') {
     var config = require('./config.json')
